@@ -5,6 +5,7 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:flutter_big_image/native_proxy.dart';
 
 class CustomPage extends StatefulWidget{
   @override
@@ -15,6 +16,8 @@ class CustomPage extends StatefulWidget{
 }
 
 class CustomPageState extends State<CustomPage> {
+
+
 
   static const double default_width = 100;
   static const double default_height = 100;
@@ -41,6 +44,13 @@ class CustomPageState extends State<CustomPage> {
 
   @override
   void initState() {
+
+    nativeProxy.eventChannel.receiveBroadcastStream()
+    .listen((event) {
+      //success
+
+    });
+
     super.initState();
 
     _width = default_width;

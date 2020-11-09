@@ -14,6 +14,7 @@ import android.graphics.Rect;
 
 import androidx.annotation.NonNull;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
@@ -31,6 +32,8 @@ public class ImageDecoderPlugin implements FlutterPlugin, ActivityAware, MethodC
 
     private static final String ORDER_DECODE = "order_decode";
 
+
+    private ImageEventChannel imageEventChannel;
 
     private MethodChannel methodChannel;
     private WeakReference<Activity> mActivity;
@@ -50,6 +53,9 @@ public class ImageDecoderPlugin implements FlutterPlugin, ActivityAware, MethodC
 
                 onSizeChanged(call);
 
+                final byte[] datas = decodeBitmap();
+                imageEventChannel.sinkData(datas);
+
                 break;
             default:
                 break;
@@ -57,16 +63,30 @@ public class ImageDecoderPlugin implements FlutterPlugin, ActivityAware, MethodC
 
     }
 
+    private byte[] decodeBitmap(){
+        options.inBitmap = bitmap;
+        bitmap = regionDecoder.decodeRegion(rect,options);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG,100,baos);
+        return baos.toByteArray();
+    }
+
+
     private Rect rect;
     private double scale,currentScale;
+    private double viewW,viewH;
 
     private void onSizeChanged(MethodCall call){
+        viewW = DensityUtil.dip2px(mActivity.get(),call.argument("viewW"));
+        viewH = DensityUtil.dip2px(mActivity.get(),call.argument("viewH"));
+        scale = call.argument("scale");
+
         rect.left =(int) DensityUtil.dip2px(mActivity.get(),call.argument("left"));
         rect.top =(int) DensityUtil.dip2px(mActivity.get(),call.argument("top"));
-        rect.right =(int) DensityUtil.dip2px(mActivity.get(),call.argument("width"));
-        rect.bottom =(int) DensityUtil.dip2px(mActivity.get(),call.argument("height"));
-        scale = rect.right / imageW;
-        currentScale = scale;
+        rect.right =(int) (DensityUtil.dip2px(mActivity.get(),call.argument("width"))*scale);
+        rect.bottom =(int) (DensityUtil.dip2px(mActivity.get(),call.argument("height"))*scale);
+        //scale = rect.right / imageW;
+        //currentScale = scale;
 
     }
 
@@ -74,6 +94,8 @@ public class ImageDecoderPlugin implements FlutterPlugin, ActivityAware, MethodC
     private BitmapFactory.Options options;
 
     private BitmapRegionDecoder regionDecoder;
+
+    private Bitmap bitmap;
 
     //原图尺寸
     private int imageW,imageH;
@@ -99,6 +121,7 @@ public class ImageDecoderPlugin implements FlutterPlugin, ActivityAware, MethodC
 
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
+        imageEventChannel = ImageEventChannel.getSingleton(binding);
         methodChannel = new MethodChannel(binding.getBinaryMessenger(),PLUGIN_NAME);
         methodChannel.setMethodCallHandler(this);
 
