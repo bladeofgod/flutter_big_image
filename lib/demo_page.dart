@@ -21,11 +21,11 @@ class DemoPageState extends State<DemoPage> {
       child: Container(
         color: Colors.white,
         width: size.width,height: size.height,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset('assets/images/1.jpg'),
-          ],
+        child: InteractiveViewer(
+          onInteractionUpdate: (update){
+            debugPrint('scale : ${update.scale}');
+          },
+          child: Image.asset('assets/images/1.jpg'),
         ),
       ),
     );
