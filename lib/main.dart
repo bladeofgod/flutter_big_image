@@ -28,7 +28,12 @@ class MyApp extends StatelessWidget {
         // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: CustomPage(),
+      home: Builder(
+        builder: (ctx){
+          final size = MediaQuery.of(ctx).size;
+          return CustomPage(size: size,);
+        },
+      ),
     );
   }
 }

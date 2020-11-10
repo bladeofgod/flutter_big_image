@@ -17,10 +17,10 @@ public class DensityUtil {
     /**
      * 根据手机的分辨率从 dp 的单位 转成为 px(像素)
      */
-    public static int dip2px(Context context, float dpValue) {
-        float scale;
+    public static int dip2px(Context context, double dpValue) {
+        double scale;
         if(context != null && context.getResources() != null) {
-            scale = context.getResources().getDisplayMetrics().density;
+            scale = (double) context.getResources().getDisplayMetrics().density;
         } else {
             scale = 2;
         }
