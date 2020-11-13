@@ -208,6 +208,7 @@ class CustomPageState extends State<CustomPage> {
       width: size.width,height: size.height,
       color: Colors.white,
       child: image(),
+      //child:Image.asset('assets/images/big5m.jpg'),
     );
   }
 
