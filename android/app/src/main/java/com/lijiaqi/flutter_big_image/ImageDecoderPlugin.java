@@ -42,7 +42,7 @@ public class ImageDecoderPlugin implements FlutterPlugin, ActivityAware, MethodC
 
     public ImageDecoderPlugin(Activity mActivity) {
         this.mActivity = new WeakReference<>(mActivity);
-        is = mActivity.getResources().openRawResource(R.raw.sponge);
+        is = mActivity.getResources().openRawResource(R.raw.big5m);
 
         initDecoder();
     }
@@ -86,8 +86,8 @@ public class ImageDecoderPlugin implements FlutterPlugin, ActivityAware, MethodC
     }
 
     private byte[] decodeBitmap(){
-        options.inBitmap = bitmap;
-        refineRect();
+        //options.inBitmap = bitmap;
+        //refineRect();
         bitmap = regionDecoder.decodeRegion(rect,options);
         if(bitmap == null) return  null;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -103,16 +103,20 @@ public class ImageDecoderPlugin implements FlutterPlugin, ActivityAware, MethodC
     private void onSizeChanged(MethodCall call){
         viewW = DensityUtil.dip2px(mActivity.get(),call.argument("viewW"));
         viewH = DensityUtil.dip2px(mActivity.get(),call.argument("viewH"));
-        scale = call.argument("scale");
-        logger("" + viewH + viewW +  scale);
-        rect.left =Math.abs((int) (DensityUtil.dip2px(mActivity.get(),call.argument("left"))/scale));
-        rect.top =Math.abs((int) (DensityUtil.dip2px(mActivity.get(),call.argument("top"))/scale));
-//        final int right = (int) ((DensityUtil.dip2px(mActivity.get(),call.argument("width")))*ratio);
-//        final int bottom = (int) ((DensityUtil.dip2px(mActivity.get(),call.argument("height")))*ratio);
-        final int right =(int) ((rect.right + rect.left)/scale);
-        final int bottom = (int) ((rect.bottom  + rect.top)/scale);
-        rect.right = Math.min(right,imageW)  ;
-        rect.bottom = Math.min(bottom,imageH);
+//        scale = 1;
+//        logger("" + viewH + viewW +  scale);
+//        rect.left =Math.abs((int) ((double)call.argument("left")/scale));
+//        rect.top =Math.abs((int) ((double)call.argument("top")/scale));
+//        rect.right = Math.abs((int)((double)call.argument("width")/scale));
+//        rect.bottom = Math.abs((int) ((double)call.argument("height")/scale));
+//        final int right =(int) ((rect.right + rect.left)/scale);
+//        final int bottom = (int) ((rect.bottom  + rect.top)/scale);
+//        rect.right = Math.min(right,imageW)  ;
+//        rect.bottom = Math.min(bottom,imageH);
+        rect.left -= (int)((double) call.argument("left"));
+        rect.top -= (int)((double)call.argument("top"));
+        rect.right = rect.left + 400;
+        rect.bottom = rect.top + 400;
         logger("ratio " + ratio);
         logger("rect : " + rect.toString());
         //scale = rect.right / imageW;
@@ -154,11 +158,11 @@ public class ImageDecoderPlugin implements FlutterPlugin, ActivityAware, MethodC
         originRect.top = 0;
         originRect.right = imageW;
         originRect.bottom = imageH;
-        rect.set(originRect);
+
         logger("origin rect " + originRect.toString());
         try {
             regionDecoder = BitmapRegionDecoder.newInstance(is,false);
-            bitmap = regionDecoder.decodeRegion(originRect,options);
+            //bitmap = regionDecoder.decodeRegion(originRect,options);
             //logger("  bitmap  " + bitmap.toString());
         } catch (IOException e) {
             e.printStackTrace();

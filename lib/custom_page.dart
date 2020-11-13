@@ -119,15 +119,15 @@ class CustomPageState extends State<CustomPage> {
       _width = _tmpW*details.scale;
       _height = _tmpH*details.scale;
     }
-
-    _x += (details.focalPoint.dx - _lastOffset.dx) ;
-    _y += (details.focalPoint.dy - _lastOffset.dy);
+    ///只传递偏移量
+    _x = (details.focalPoint.dx - _lastOffset.dx) ;
+    _y = (details.focalPoint.dy - _lastOffset.dy);
 
     _treeMap['scale'] = details.scale;
     _treeMap['left'] = _x;
     _treeMap['top'] = _y;
-    _treeMap['width'] = _width;
-    _treeMap['height'] = _height;
+    _treeMap['width'] = 400.0;
+    _treeMap['height'] = 400.0;
     debugPrint(_treeMap.toString());
 
     //边界判定，保持宽高比
