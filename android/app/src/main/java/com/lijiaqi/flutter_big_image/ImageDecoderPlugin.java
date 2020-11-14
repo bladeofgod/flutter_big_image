@@ -55,9 +55,9 @@ public class ImageDecoderPlugin implements FlutterPlugin, ActivityAware, MethodC
     public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
         switch (call.method){
             case ORDER_DECODE:
-                if(ratio == 0.0){
-                    ratio = (double) imageH/DensityUtil.dip2px(mActivity.get(),call.argument("viewH"));
-                }
+//                if(ratio == 0.0){
+//                    ratio = (double) imageH/DensityUtil.dip2px(mActivity.get(),call.argument("viewH"));
+//                }
 
                 onSizeChanged(call);
 
@@ -98,13 +98,21 @@ public class ImageDecoderPlugin implements FlutterPlugin, ActivityAware, MethodC
 
     private final Rect rect = new Rect();
     private double scale,currentScale;
-    private double viewW,viewH;
+//    private double viewW,viewH;
 
-    private final int testW = 400,testH = 400;
+    //图像显示区域
+    private int testW = 400,testH = 400;
+
+    //private final int throttle = 5;
+    ///扩大缩小系数，不用scale 速度过快
+    private final double expandR = 1.1;
+    private final double reduce = 0.9;
+
 
     private void onSizeChanged(MethodCall call){
-        viewW = DensityUtil.dip2px(mActivity.get(),call.argument("viewW"));
-        viewH = DensityUtil.dip2px(mActivity.get(),call.argument("viewH"));
+//        viewW = DensityUtil.dip2px(mActivity.get(),call.argument("viewW"));
+//        viewH = DensityUtil.dip2px(mActivity.get(),call.argument("viewH"));
+        scale = call.argument("scale");
 //        scale = 1;
 //        logger("" + viewH + viewW +  scale);
 //        rect.left =Math.abs((int) ((double)call.argument("left")/scale));
@@ -117,12 +125,37 @@ public class ImageDecoderPlugin implements FlutterPlugin, ActivityAware, MethodC
 //        rect.bottom = Math.min(bottom,imageH);
         rect.left -= (int)((double) call.argument("left"));
         rect.top -= (int)((double)call.argument("top"));
-        rect.right = rect.left + testW;
-        rect.bottom = rect.top + testH;
-        logger("ratio " + ratio);
+
+        //logger("ratio " + ratio);
         logger("rect : " + rect.toString());
         //scale = rect.right / imageW;
         //currentScale = scale;
+        if(scale > 1.0 ){
+            ///放大图片
+            testW = (int)Math.max((testW/expandR),300);
+            testH = (int)Math.max((testH/expandR),300);
+//            rect.top /= scale;
+//            rect.left /= scale;
+//            rect.right /= scale;
+//            rect.bottom /= scale;
+            logger("scale  : " + scale);
+
+
+        }else if(scale < 1.0 ){
+            ///缩小图片
+            testW = (int)Math.min((testW/reduce), 800);
+            testH = (int)Math.min((testH/reduce),  800);
+//            rect.top /= scale;
+//            rect.left /= scale;
+//            rect.right /= scale;
+//            rect.bottom /= scale;
+            logger("scale  : " + scale);
+
+
+        }
+        rect.right = rect.left + testW;
+        rect.bottom = rect.top + testH;
+
 
         adjustRect();
 
@@ -152,7 +185,7 @@ public class ImageDecoderPlugin implements FlutterPlugin, ActivityAware, MethodC
     private int imageW,imageH;
 
     ///view 和 图片的 比
-    private double ratio = 0.0;
+    //private double ratio = 0.0;
 
     private void initDecoder(){
 
