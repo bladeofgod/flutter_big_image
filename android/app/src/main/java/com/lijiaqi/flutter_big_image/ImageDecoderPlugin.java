@@ -100,6 +100,8 @@ public class ImageDecoderPlugin implements FlutterPlugin, ActivityAware, MethodC
     private double scale,currentScale;
     private double viewW,viewH;
 
+    private final int testW = 400,testH = 400;
+
     private void onSizeChanged(MethodCall call){
         viewW = DensityUtil.dip2px(mActivity.get(),call.argument("viewW"));
         viewH = DensityUtil.dip2px(mActivity.get(),call.argument("viewH"));
@@ -115,13 +117,26 @@ public class ImageDecoderPlugin implements FlutterPlugin, ActivityAware, MethodC
 //        rect.bottom = Math.min(bottom,imageH);
         rect.left -= (int)((double) call.argument("left"));
         rect.top -= (int)((double)call.argument("top"));
-        rect.right = rect.left + 400;
-        rect.bottom = rect.top + 400;
+        rect.right = rect.left + testW;
+        rect.bottom = rect.top + testH;
         logger("ratio " + ratio);
         logger("rect : " + rect.toString());
         //scale = rect.right / imageW;
         //currentScale = scale;
 
+        adjustRect();
+
+    }
+    private void adjustRect(){
+        rect.top = Math.max(rect.top, 0);
+        rect.left = Math.max(rect.left, 0);
+        rect.top = Math.min(rect.top, imageH-testH);
+        rect.left = Math.min(rect.left, imageW-testW);
+        rect.right = Math.min(rect.right, imageW);
+        rect.bottom = Math.min(rect.bottom, imageH);
+        rect.right = Math.max(rect.right, testW);
+        rect.bottom = Math.max(rect.bottom, testH);
+        logger("adjust : " + rect.toString());
     }
 
 
