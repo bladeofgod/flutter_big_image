@@ -103,6 +103,12 @@ public class ImageDecoderPlugin implements FlutterPlugin, ActivityAware, MethodC
     //图像显示区域
     private int testW = 400,testH = 400;
 
+    //最小解码尺寸
+    private final int decodeDimenMin = 300;
+    //最大解码尺寸
+    private final int decodeDimenMax = 800;
+
+
     //private final int throttle = 5;
     ///扩大缩小系数，不用scale 速度过快
     private final double expandR = 1.1;
@@ -132,8 +138,8 @@ public class ImageDecoderPlugin implements FlutterPlugin, ActivityAware, MethodC
         //currentScale = scale;
         if(scale > 1.0 ){
             ///放大图片
-            testW = (int)Math.max((testW/expandR),300);
-            testH = (int)Math.max((testH/expandR),300);
+            testW = (int)Math.max((testW/expandR),decodeDimenMin);
+            testH = (int)Math.max((testH/expandR),decodeDimenMin);
 //            rect.top /= scale;
 //            rect.left /= scale;
 //            rect.right /= scale;
@@ -143,8 +149,8 @@ public class ImageDecoderPlugin implements FlutterPlugin, ActivityAware, MethodC
 
         }else if(scale < 1.0 ){
             ///缩小图片
-            testW = (int)Math.min((testW/reduce), 800);
-            testH = (int)Math.min((testH/reduce),  800);
+            testW = (int)Math.min((testW/reduce), decodeDimenMax);
+            testH = (int)Math.min((testH/reduce),  decodeDimenMax);
 //            rect.top /= scale;
 //            rect.left /= scale;
 //            rect.right /= scale;
